@@ -1,4 +1,4 @@
-#==========[IMPORT LIBRARIES]==========#
+#------------------- IMPORT LIBRARIE ---------------- #
 
 # Cloning Libraries
 import requests
@@ -15,20 +15,18 @@ import sqlalchemy
 from sqlalchemy import create_engine
 
 
-#==========[CLONING OF GITHUB REPOSITORY URL]==========#
+#------------------- CLONING OF GITHUB REPOSITORY URL -------------------#
 
-# Cloning of the required GitHub repository url
-#response = requests.get('https://api.github.com/repos/PhonePe/pulse')
-#repo = response.json()
-#clone_url = repo['clone_url']
+Cloning of the required GitHub repository url
+response = requests.get('https://api.github.com/repos/PhonePe/pulse')
+repo = response.json()
+clone_url = repo['clone_url']
 
-# Specify the local directory path and clone the repository
-#clone_dir = "C:/Users/viswa/OneDrive/Documents/Project/Phonepe-Pulse-Data-Visualization-main"
-#subprocess.run(["git", "clone", clone_url, clone_dir], check=True)
+ Specify the local directory path and clone the repository
+clone_dir = "C:/Users/viswa/OneDrive/Documents/Project/Phonepe_Final"
+subprocess.run(["git", "clone", clone_url, clone_dir], check=True)
 
-# ==========[DATA PROCESSING]==========#
-
-# Processing the Aggregated data, Map data and Top data
+#------------------- DATA PROCESSING -------------------#
 
 # AGGREGATE DATA --> TRANSACTION
 
@@ -228,7 +226,7 @@ for i in top_user_state_list:
 
 df_top_user = pd.DataFrame(top_user)
 
-#  =============     CONNECT SQL SERVER  /   CREAT DATA BASE    /  CREAT TABLE    /    STORE DATA    ========  #
+#  --------------   CONNECT SQL SERVER  ---------------- #
 
 # Connect to the MySQL server
 mydb = mysql.connector.connect(
@@ -239,6 +237,7 @@ mydb = mysql.connector.connect(
 )
 
 
+#----------------  CREATE DATA BASE  --------------------- #
 # Create a new database and use
 mycursor = mydb.cursor()
 mycursor.execute("CREATE DATABASE IF NOT EXISTS phonepe_pulse")
@@ -250,9 +249,9 @@ mydb.close()
 # Connect to the new created database
 engine = create_engine('mysql+mysqlconnector://root:admin123@localhost/phonepe_pulse', echo=False)
 
-# Use pandas to insert the DataFrames datas to the SQL Database -> table1
 
-# 1
+#-------------------------------  CREAT TABLE AND STORE DATA  ----------------------------#
+
 df_aggregated_transaction.to_sql('aggregated_transaction', engine, if_exists = 'replace', index=False,
                                  dtype={'State': sqlalchemy.types.VARCHAR(length=50),
                                        'Year': sqlalchemy.types.Integer,
@@ -260,7 +259,7 @@ df_aggregated_transaction.to_sql('aggregated_transaction', engine, if_exists = '
                                        'Transaction_type': sqlalchemy.types.VARCHAR(length=50),
                                        'Transaction_count': sqlalchemy.types.Integer,
                                        'Transaction_amount': sqlalchemy.types.FLOAT(precision=5, asdecimal=True)})
-# 2
+
 df_aggregated_user.to_sql('aggregated_user', engine, if_exists = 'replace', index=False,
                           dtype={'State': sqlalchemy.types.VARCHAR(length=50),
                                  'Year': sqlalchemy.types.Integer,
@@ -268,7 +267,7 @@ df_aggregated_user.to_sql('aggregated_user', engine, if_exists = 'replace', inde
                                  'Brands': sqlalchemy.types.VARCHAR(length=50),
                                  'User_Count': sqlalchemy.types.Integer,
                                  'User_Percentage': sqlalchemy.types.FLOAT(precision=5, asdecimal=True)})
-# 3
+
 df_map_transaction.to_sql('map_transaction', engine, if_exists = 'replace', index=False,
                           dtype={'State': sqlalchemy.types.VARCHAR(length=50),
                                  'Year': sqlalchemy.types.Integer,
@@ -276,14 +275,14 @@ df_map_transaction.to_sql('map_transaction', engine, if_exists = 'replace', inde
                                  'District': sqlalchemy.types.VARCHAR(length=50),
                                  'Transaction_Count': sqlalchemy.types.Integer,
                                  'Transaction_Amount': sqlalchemy.types.FLOAT(precision=5, asdecimal=True)})
-# 4
+
 df_map_user.to_sql('map_user', engine, if_exists = 'replace', index=False,
                    dtype={'State': sqlalchemy.types.VARCHAR(length=50),
                           'Year': sqlalchemy.types.Integer,
                           'Quarter': sqlalchemy.types.Integer,
                           'District': sqlalchemy.types.VARCHAR(length=50),
                           'Registered_User': sqlalchemy.types.Integer, })
-# 5
+
 df_top_transaction.to_sql('top_transaction', engine, if_exists = 'replace', index=False,
                          dtype={'State': sqlalchemy.types.VARCHAR(length=50),
                                 'Year': sqlalchemy.types.Integer,
@@ -291,7 +290,7 @@ df_top_transaction.to_sql('top_transaction', engine, if_exists = 'replace', inde
                                 'District_Pincode': sqlalchemy.types.Integer,
                                 'Transaction_count': sqlalchemy.types.Integer,
                                 'Transaction_amount': sqlalchemy.types.FLOAT(precision=5, asdecimal=True)})
-# 6
+
 df_top_user.to_sql('top_user', engine, if_exists = 'replace', index=False,
                    dtype={'State': sqlalchemy.types.VARCHAR(length=50),
                           'Year': sqlalchemy.types.Integer,

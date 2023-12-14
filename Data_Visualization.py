@@ -74,6 +74,7 @@ with my_expander:
                 select = st.radio("**Choose Your Option**",["India", "States"],horizontal=True)
             with analysis:
                 radio = st.radio("**Choose Your Option**",["Transaction","User"],horizontal=True)
+            Insights = st.radio("**Data Insights**",["Phonepe - Data Insights"],horizontal=True)
 # ---------------------------------- India Transaction Details ------------------------------- #
 if select=="India":
     if radio=="Transaction":
@@ -571,5 +572,170 @@ elif select == "States":
                 fig_st = px.sunburst(df_st_user_tab_qry_rslt, path=['State', 'District'],
                                      values='Registered_Users', maxdepth=2,color='District',color_continuous_scale='RdBu',)
                 st.plotly_chart(fig_st, theme=None, use_container_width=True)
+            
+#INSIGHTS TAB
+if Insights:
+    st.write(
+                f' <p style="font-family:cambria; font-size: 40px; font-weight:Bold; color:#391C59;">DATA INSIGHTS</p>',
+                unsafe_allow_html=True)
+   
+    select = st.selectbox("The Basic Insights", ('Select Query Here',
+               "Top 10 states based on year and amount of transaction",
+               "Least 10 states based on year and amount of transaction",
+               "Top 10 States and Districts based on Registered Users",
+               "Least 10 States and Districts based on Registered Users",
+               "Top 10 Districts based on the Transaction Amount",
+               "Least 10 Districts based on the Transaction Amount",
+               "Top 10 Districts based on the Transaction count",
+               "Least 10 Districts based on the Transaction count",
+               "Top Transaction types based on the Transaction Amount",
+               "Top 10 Mobile Brands based on the User count of transaction"))
+  
+
+    #1
+    if select == "Top 10 states based on year and amount of transaction":
+        cursor.execute(f"SELECT DISTINCT State,Year, SUM(Transaction_amount) AS Total_Transaction_Amount FROM top_transaction GROUP BY State,Year ORDER BY Total_Transaction_Amount DESC LIMIT 10");
+
+        data = cursor.fetchall()
+        columns = ['States', 'Year', 'Transaction_amount']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+       
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Top 10 states based on amount of transaction")
+            st.bar_chart(data=df, x="Transaction_amount", y="States")
+
+    #2
+    elif select == "Least 10 states based on year and amount of transaction":
+        cursor.execute(
+            "SELECT DISTINCT State,Year, SUM(Transaction_amount) as Total FROM top_transaction GROUP BY State, Year ORDER BY Total ASC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['States', 'Year', 'Transaction_amount']
+        df = pd.DataFrame(data, columns=columns, index=range(1,len(data)+1))
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Least 10 states based on amount of transaction")
+            st.bar_chart(data=df, x="Transaction_amount", y="States")
+
+    #3
+    elif select == "Top 10 States and Districts based on Registered Users":
+        cursor.execute("SELECT DISTINCT State, District_Pincode, SUM(Registered_User) AS Users FROM top_user GROUP BY State, District_Pincode ORDER BY Users DESC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['State', 'District_Pincode', 'Registered_User']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Top 10 States and Districts based on Registered Users")
+            st.bar_chart(data=df, x="Registered_User", y="State")
+
+    #4
+    elif select == "Least 10 States and Districts based on Registered Users":
+        cursor.execute("SELECT DISTINCT State, District_Pincode, SUM(Registered_User) AS Users FROM top_user GROUP BY State, District_Pincode ORDER BY Users ASC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['State', 'District_Pincode', 'Registered_User']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Least 10 States and Districts based on Registered Users")
+            st.bar_chart(data=df, x="Registered_User", y="State")
+
+    #5
+    elif select == "Top 10 Districts based on the Transaction Amount":
+        cursor.execute(
+            "SELECT DISTINCT State ,District,SUM(Transaction_Amount) AS Total FROM map_transaction GROUP BY State ,District ORDER BY Total DESC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['States', 'District', 'Transaction_Amount']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Top 10 Districts based on Transaction Amount")
+            st.bar_chart(data=df, x="District", y="Transaction_Amount")
+
+    #6
+    elif select == "Least 10 Districts based on the Transaction Amount":
+        cursor.execute(
+            "SELECT DISTINCT State,District,SUM(Transaction_amount) AS Total FROM map_transaction GROUP BY State, District ORDER BY Total ASC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['States', 'District', 'Transaction_amount']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Least 10 Districts based on Transaction Amount")
+            st.bar_chart(data=df, x="District", y="Transaction_amount")
+
+    #7
+    elif select == "Top 10 Districts based on the Transaction count":
+        cursor.execute(
+            "SELECT DISTINCT State,District,SUM(Transaction_Count) AS Counts FROM map_transaction GROUP BY State ,District ORDER BY Counts DESC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['States', 'District', 'Transaction_Count']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Top 10 Districts based on Transaction Count")
+            st.bar_chart(data=df, x="Transaction_Count", y="District")
+
+    #8
+    elif select == "Least 10 Districts based on the Transaction count":
+        cursor.execute(
+            "SELECT DISTINCT State ,District,SUM(Transaction_Count) AS Counts FROM map_transaction GROUP BY State ,District ORDER BY Counts ASC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['States', 'District', 'Transaction_Count']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Top 10 Districts based on the Transaction Count")
+            st.bar_chart(data=df, x="Transaction_Count", y="District")
+
+    #9
+    elif select == "Top Transaction types based on the Transaction Amount":
+        cursor.execute(
+            "SELECT DISTINCT Transaction_type, SUM(Transaction_amount) AS Amount FROM aggregated_transaction GROUP BY Transaction_type ORDER BY Amount DESC LIMIT 5");
+        data = cursor.fetchall()
+        columns = ['Transaction_type', 'Transaction_amount']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Top Transaction Types based on the Transaction Amount")
+            st.bar_chart(data=df, x="Transaction_type", y="Transaction_amount")
+
+    #10
+    elif select == "Top 10 Mobile Brands based on the User count of transaction":
+        cursor.execute(
+            "SELECT DISTINCT Brands,SUM(User_Count) as Total FROM aggregated_user GROUP BY Brands ORDER BY Total DESC LIMIT 10");
+        data = cursor.fetchall()
+        columns = ['Brands', 'User_Count']
+        df = pd.DataFrame(data, columns=columns, index=range(1, len(data) + 1))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(df)
+        with col2:
+            st.title("Top 10 Mobile Brands based on User count of transaction")
+            st.bar_chart(data=df , x="User_Count", y="Brands")
 
 
